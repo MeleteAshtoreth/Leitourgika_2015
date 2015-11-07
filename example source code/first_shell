@@ -3,3 +3,7 @@ clear
 echo "Good evening, folks."
 echo
 echo "    How are you?"
+ps
+pwd
+uname
+df
