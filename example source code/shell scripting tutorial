@@ -88,4 +88,23 @@ Here are a few keys which may be pressed to perform certain functions.
 Control-D
     When typed after a partial filename, C shell gives a list of all matching filenames or commands. 
 Control-W
-    Erases over the previous word.     
+    Erases over the previous word. 
+
+
+
+The C shell provides programming features listed below:
+
+    Control constructs. (For example, loop and conditional statements.)
+    File permissions/existence checking.
+    Variable assignment.
+    Built-in Variables. 
+
+
+Pipes
+The output of one command can be sent to the input of another command. This is called piping. The commands which are to be piped together are separated by the pipe character. For example:
+
+ls -l | sort -k 5n
+
+This command takes the output of the ls -l command and puts the output of it into the sort command.
+
+By appending an ampersand (&) after the pipe character, one can combine the standard error and standard output and send it to the standard input of the program receiving the piped output.            
