@@ -453,3 +453,63 @@ do_job_notification (void)
         jlast = j;
     }
 }
+
+/*
+The shell can continue a stopped job by sending a SIGCONT signal to its process group. 
+If the job is being continued in the foreground, the shell should first invoke tcsetpgrp to give the job access to the terminal, and restore the saved terminal settings. 
+After continuing a job in the foreground, the shell should wait for the job to stop or complete, as if the job had just been launched in the foreground.
+
+The sample shell program handles both newly created and continued jobs with the same pair of functions, put_job_in_foreground and put_job_in_background. 
+The definitions of these functions were given in Foreground and Background. 
+When continuing a stopped job, a nonzero value is passed as the cont argument to ensure that the SIGCONT signal is sent and the terminal modes reset, as appropriate.
+
+This leaves only a function for updating the shell’s internal bookkeeping about the job being continued:
+*/
+
+/* Mark a stopped job J as being running again.  */
+void
+mark_job_as_running (job *j)
+{
+  Process *p;
+
+  for (p = j->first_process; p; p = p->next)
+    p->stopped = 0;
+  j->notified = 0;
+}
+
+/* Continue the job J.  */
+void
+continue_job (job *j, int foreground)
+{
+  mark_job_as_running (j);
+  if (foreground)
+    put_job_in_foreground (j, 1);
+  else
+    put_job_in_background (j, 1);
+}
+
+
+/*
+The code extracts for the sample shell included in this chapter are only a part of the entire shell program. 
+In particular, nothing at all has been said about how job and program data structures are allocated and initialized.
+
+Most real shells provide a complex user interface that has support for a command language; variables; abbreviations, substitutions, and pattern matching on file names; and the like. 
+All of this is far too complicated to explain here! Instead, we have concentrated on showing how to implement the core process creation and job control functions that can be called from such a shell.
+
+Here is a table summarizing the major entry points we have presented:
+*/
+void init_shell (void)
+
+  //  Initialize the shell’s internal state. See Initializing the Shell.
+void launch_job (job *j, int foreground)
+
+  //  Launch the job j as either a foreground or background job. See Launching Jobs.
+void do_job_notification (void)
+
+  //  Check for and report any jobs that have terminated or stopped. Can be called synchronously or within a handler for SIGCHLD signals. See Stopped and Terminated Jobs.
+void continue_job (job *j, int foreground)
+
+  //  Continue the job j. See Continuing Stopped Jobs. 
+
+//Of course, a real shell would also want to provide other functions for managing jobs. 
+//For example, it would be useful to have commands to list all active jobs or to send a signal (such as SIGKILL) to a job. 
