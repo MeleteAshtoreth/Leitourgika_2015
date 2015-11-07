@@ -1,5 +1,5 @@
 #!/bin/bash
 clear
-echo    "Good evening, folks."
+echo "Good evening, folks."
 echo
 echo "    How are you?"
