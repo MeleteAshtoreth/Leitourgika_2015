@@ -107,4 +107,25 @@ ls -l | sort -k 5n
 
 This command takes the output of the ls -l command and puts the output of it into the sort command.
 
-By appending an ampersand (&) after the pipe character, one can combine the standard error and standard output and send it to the standard input of the program receiving the piped output.            
+By appending an ampersand (&) after the pipe character, one can combine the standard error and standard output and send it to the standard input of the program receiving the piped output .           
+
+
+
+!!!!
+ After saving this plain text file, with a file name such as morning (or anything else desired), the script is complete and almost ready to run. Scripts are typically run by typing a dot, a forward slash and the file name (with no spaces in between) and then pressing the ENTER key. Thus, for example, if the above script were saved with the name morning, an attempt could be made to execute it by issuing the following command:
+
+    ./morning
+
+However, the script probably will not run, in which case an error message will appear on the screen such as bash: ./morning: Permission denied. This is because the permissions for the file first have to be set to executable. (By default, the permissions for new files are set to read and write only.) The problem can easily be solved by using the chmod command with its 755 option (which will allow the file creator to read, write and execute the file) while in the same directory as that in which the file is located as follows
+
+ How It Works
+
+The first of the three lines tells the operating system what shell to use to interpret the script and the location (i.e., absolute pathname) of the shell. The shell is bash, which is located in the /bin directory (as are all shells); thus the line contains /bin/bash. This instruction is always preceded by a pound sign and an exclamation mark in order to inform the operating system that it is providing the name and location of the shell (or other scripting language).
+
+The second line tells the shell to issue the clear command. This is a very simple command that removes all previous commands and output from the console or terminal window in which the command was issued.
+
+The third line tells the shell to write the phrase Good morning, world. on the screen. It uses the echo command, which instructs the shell to repeat whatever follows it. (The quotation marks are not necessary in this case; however, it is good programming practice to use them, and they can make a big difference in more advanced scripts.) In slightly more technical terms, Good morning, world. is an argument (i.e., input data) that is passed to the echo command.
+
+As is the case with other commands used in shell scripts, clear and echo can also be used independently of scripts. Thus, for example, typing clear on the screen and pressing the ENTER key would remove all previous commands and output and just leave a command prompt for entering the next command. 
+
+
