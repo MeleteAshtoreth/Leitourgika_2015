@@ -1,3 +1,4 @@
 #!/bin/bash
 clear
 echo "Good evening, folks."
+echo "How are you?"
