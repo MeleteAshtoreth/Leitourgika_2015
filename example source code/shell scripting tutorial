@@ -1,0 +1,91 @@
+Some of the features of the C shell are listed here:
+
+    1.	Customizable environment.
+The C shell has three separate files which are used for customizing its environment. These three files are .cshrc, .login, and .logout. Because these files begin with a period (.) they do not usually appear when one types the ls command. In order to see all files beginning with periods, the -a option is used with the ls command.
+
+The .cshrc file contains commands, variable definitions and aliases used any time the C shell is run. When one logs in, the C shell starts by reading the .cshrc file, and sets up any variables and aliases.
+
+The C shell reads the .login file after it has read the .cshrc file. This file is read once only for login shells. This file should be used to set up terminal settings, for example, backspace, suspend, and interrupt characters.
+
+The .logout file contains commands that are run when the user logs out of the system.
+
+Sample .cshrc file
+
+#!/bin/csh
+# Sample .cshrc file
+setenv EXINIT 'set smd sw=4 wm=2'
+set history=50
+set savehist=50
+set ignoreeof noclobber
+if ($?prompt) then
+  set prompt='[\!]% '
+  alias f finger -R
+  alias lo logout
+endif
+
+Sample .login file
+
+#!/bin/csh
+# Sample .login file
+stty erase ^H intr ^C susp ^Z
+echo "Welcome to Wiliki\!"
+frm -s n
+
+Sample .logout file
+
+#!/bin/csh
+# Sample .logout file
+echo -n "Logged out of Wiliki "
+date
+
+
+    2.	Abbreviate commands. (Aliases.)
+A shorthand can be assigned to a command or sequence of commands which are frequently used. By assigning an alias with the alias command, one can essentially create their own commands, and even "overwrite" existing commands. For example:
+
+alias cc cc -Aa -D_HPUX_SOURCE
+
+This alias definition will substitute the cc with the ANSI compiler option on an HP System (such as Wiliki) whenever cc is typed. To undefine an alias, the unalias command is used.
+
+If the filenames used behind an alias must come before text being substituted, history substitution can be used, as follows:
+
+alias manl 'man \!* | less -p'
+
+This form of the command places the arguments placed after the manl alias between the man command and the | (pipe). 
+
+
+    3.	History. (Remembers commands typed before.)
+If the history variable is set to a numerical value, that many commands typed previous would be remembered in a history list. Commands from the history are numbered from the first command being 1. To see the history, the history command is used.
+
+Commands from the history can be recalled using the exclamation point. For example, !! repeats the previous command, !25 re-types command number 25 from the history, and !-2 re-types the second line previous to the current line.
+
+Individual words from these command lines can also be retrieved using this history. For example, !25:$ returns the last argument (word) from command 25, !!:* returns all the arguments (all words but the first one) from the last command, and !-2:0 returns the command (the first word) of the second line previous.
+
+    4.	Job control. (Run programs in the background or foreground.)
+The C shell handles job control, which allows the user to run certain programs in the background, and recall them to the foreground when necessary. In order to place a running process into the background, the suspend character must be set by the stty command shown earlier. Processes may be started in the background by following the command with an ampersand (&).
+
+When a job is placed in the background, information for the job is shown similar to the example given below:
+
+[1] 15934
+
+This specifies that the process has been placed in the background, and is job 1. In order to recall jobs placed in the background, the fg command is used, while the bg command places a recently stopped process into the background. The jobs command gives a list of all processes under control of the current shell. Also, typing a percent sign (%) with the job number brings that particular job to the foreground.
+
+    5.	Shell scripting. (One can write programs using the shell.)
+ Shell scripts are programs written in C shell. They are plain text files which can be edited and created by any text editor. There are a few guidelines to follow, however.
+
+   1. Create a file using any text editor. The first line must begin with the string #!/bin/csh.
+   2. Give yourself execute permission with the chmod u+x filename command.
+   3. You can run the shell script by simply typing filename as if it were a regular command. 
+
+The shell script file can contain any commands which can be typed in, as well as the control structures described above.
+
+Check   https://www.cs.duke.edu/csl/docs/csh.html#scripts   
+
+    6.	Keyboard shortcuts. 
+Here are a few keys which may be pressed to perform certain functions.
+
+<escape>
+    The escape key preceded by a partial command or filename will attempt to complete the filename. If there are more than one filename matching, the common letters are completed, and the C shell beeps. 
+Control-D
+    When typed after a partial filename, C shell gives a list of all matching filenames or commands. 
+Control-W
+    Erases over the previous word.     
