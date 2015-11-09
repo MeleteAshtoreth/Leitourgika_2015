@@ -1,9 +1,19 @@
 #!/bin/bash
-clear
+alias ll='ls -l'
+alias dir='ls
+'alias copy='cp'
+
+
 echo "Good evening, folks."
 echo
 echo "    How are you?"
-ps
-pwd
-uname
-df
+
+#ps
+#pwd
+#uname
+#df
+dir
+echo
+
+read -p "Enter your name: " userName
+echo $userName

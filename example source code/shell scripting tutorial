@@ -129,3 +129,49 @@ The third line tells the shell to write the phrase Good morning, world. on the s
 As is the case with other commands used in shell scripts, clear and echo can also be used independently of scripts. Thus, for example, typing clear on the screen and pressing the ENTER key would remove all previous commands and output and just leave a command prompt for entering the next command. 
 
 
+What is difference between #!/bin/sh and #!/bin/bash?
+
+
+bash and sh are two different shells. Basically bash is sh, with more features and better syntax. Most commands work the same, but they are different.
+
+Having said that, you should realize /bin/sh on most systems will be a symbolic link and will not invoke sh. In Ubuntu /bin/sh used to link to bash, typical behavior on Linux distributions, but now has changed to linking to another shell called dash. I would use bash, as that is pretty much the standard (or at least most common, from my experience). In fact, problems arise when a bash script will use #!/bin/sh because the script-maker assumes the link is to bash when it doesn't have to be.
+
+For more info, http://man.cx/sh, http://man.cx/bash.
+
+
+
+
+You need to ensure one more thing before you can execute myenv—it must be in the search path. You can get the search path by executing
+
+
+   # echo $PATH
+
+If the directory where the file myenv is located is not in the current search path, you must add the directory name in the search path.
+
+How do I add a directory to my $PATH in Ubuntu and make the changes permanent? 
+Using ~/.profile to set $PATH
+A path set in .bash_profile will only be set in a bash login shell (bash -l). 
+If you put your path in .profile it will be available to your complete desktop session. 
+That means even metacity will use it.
+For example ~/.profile:
+
+if [ -d "$HOME/bin" ] ; then
+  PATH="$HOME/bin:$PATH"
+fi
+
+Btw, you can check the PATH variable of a process by looking at its environment in /proc/[pid]/environ. (replace [pid] with the number from ps axf)
+Note:
+
+bash as a login shell doesn't parse .profile if either .bash_profile or .bash_login exists. From man bash :
+
+    it looks for ~/.bash_profile, ~/.bash_login, and ~/.profile, in that order, and reads and executes commands from the first one that exists and is readable.
+
+See the answers below for information about .pam_environment, or .bashrc for interactive non-login shells, or set the value globally for all users by putting a script into /etc/profile.d/ or use /etc/X11/Xsession.d/ to affect the display managers session.
+
+export PATH=$PATH:directory
+
+Now you can execute the file myenv from the command line as if it were a Linux command:
+
+
+   # myenv
+
