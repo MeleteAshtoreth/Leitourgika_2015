@@ -9,6 +9,64 @@
 #include <string.h>		/* Heador of functions that manipulate strings and arrays.*/
 
 #define INPUT_SIZE 1024 /* This is size of the input from the user. */
+#define TOKEN_DELIM " \t\r\n\a"
+
+int launchProgram(char *programName_)
+{
+	char *token;
+	char **args = malloc(INPUT_SIZE * sizeof(char*));
+	int index = 0;
+  	pid_t pid;
+  	int status;
+
+  	// token = strtok(programName_, "-");
+  	// while(token != NULL)
+  	// {
+  	// 	printf("token is not null\n");
+  	// 	printf( " %s\n", token );
+ 		// token = strtok(NULL, "-");
+
+  	// 	args[index] = token;
+  	// 	index++;
+
+
+  	// }
+  	// args[index] = NULL;
+  	// printf("%s\n", token);
+ 	
+
+ 	  		/*------------------*/
+  		  token = strtok(programName_, TOKEN_DELIM);
+
+ 		 while (token != NULL) {
+   			 	args[index] = token;
+    			index++;
+   				 printf("index: %d %s\n", index, args[index]);
+
+    			token = strtok(NULL, TOKEN_DELIM);
+  			}
+  			args[index] = NULL;
+
+ 	pid = fork();
+ 	if (pid == 0) {
+   	 // Child process
+    	if (execvp(args[0], args) == -1) {
+      	perror("lsh");
+    	}
+    	exit(EXIT_FAILURE);
+  		} else if (pid < 0) {
+    		// Error forking
+    		perror("lsh");
+  		} else 
+  		{
+    		// Parent process
+    		do {
+      			waitpid(pid, &status, WUNTRACED);
+    			} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  		}
+
+  return 1;
+}
 
 
 /*
@@ -73,9 +131,13 @@ int main(int argc, char **argv)
 
 			/* Set index of the programName array to the next read position. */
 			index += 1;
+		}
 
 			printf("Idx = %d is %s\n", index, programName);
-		}
+
+		status = launchProgram(programName);
+
+
 
 	}while(status);
 
