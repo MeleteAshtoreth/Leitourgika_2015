@@ -264,8 +264,6 @@ void lsh_loop(void)
         printf("Args = %d %s\n", a, args[a]);
     }
 
-
-
     status = lsh_execute(args);
     printf("status = %d\n", status);
 

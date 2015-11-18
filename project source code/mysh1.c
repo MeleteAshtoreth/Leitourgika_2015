@@ -9,62 +9,82 @@
 #include <string.h>		/* Heador of functions that manipulate strings and arrays.*/
 
 #define INPUT_SIZE 1024 /* This is size of the input from the user. */
-#define TOKEN_DELIM " \t\r\n\a"
+
+/**
+   @brief Bultin command: change directory.
+   @param args List of args.  args[0] is "cd".  args[1] is the directory.
+   @return Always returns 1, to continue executing.
+ */
+int myCd(char **args)
+{
+  if (args[1] == NULL) {
+    fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+  } else {
+    if (chdir(args[1]) != 0) {
+      perror("lsh");
+    }
+  }
+  return 1;
+}
+
+int myExit()
+{
+	return 0;
+}
 
 int launchProgram(char *programName_)
 {
 	char *token;
-	char **args = malloc(INPUT_SIZE * sizeof(char*));
+	char **tokenisedArgs = malloc(INPUT_SIZE * sizeof(char*));
 	int index = 0;
   	pid_t pid;
-  	int status;
+  	int status; 
 
-  	// token = strtok(programName_, "-");
-  	// while(token != NULL)
-  	// {
-  	// 	printf("token is not null\n");
-  	// 	printf( " %s\n", token );
- 		// token = strtok(NULL, "-");
+  	token = strtok(programName_, " ");
 
-  	// 	args[index] = token;
-  	// 	index++;
+ 	while (token != NULL) {
+   	 	tokenisedArgs[index] = token;
+    	index++;
+   		 //printf("index: %d %s\n", index, args[index]);
+		token = strtok(NULL, " ");
+  	}
+  	tokenisedArgs[index] = NULL;
 
-
-  	// }
-  	// args[index] = NULL;
-  	// printf("%s\n", token);
- 	
-
- 	  		/*------------------*/
-  		  token = strtok(programName_, TOKEN_DELIM);
-
- 		 while (token != NULL) {
-   			 	args[index] = token;
-    			index++;
-   				 printf("index: %d %s\n", index, args[index]);
-
-    			token = strtok(NULL, TOKEN_DELIM);
-  			}
-  			args[index] = NULL;
-
- 	pid = fork();
- 	if (pid == 0) {
-   	 // Child process
-    	if (execvp(args[0], args) == -1) {
-      	perror("lsh");
-    	}
-    	exit(EXIT_FAILURE);
-  		} else if (pid < 0) {
-    		// Error forking
-    		perror("lsh");
-  		} else 
-  		{
-    		// Parent process
-    		do {
-      			waitpid(pid, &status, WUNTRACED);
+	    if (strcmp(tokenisedArgs[0], "cd") == 0)
+	    {
+      		return myCd(tokenisedArgs);
+      	}
+      	else if (strcmp(tokenisedArgs[0], "exit") == 0)
+      	{
+      		return myExit();
+      	}
+      	else
+      	{
+      		pid = fork();
+ 			if (pid == 0) {
+   	 		// Child process
+    			if (execvp(tokenisedArgs[0], tokenisedArgs) == -1) 
+    			{
+      				perror("Error");
+    			}
+    			exit(EXIT_FAILURE);
+  			} 
+  			else if (pid < 0) 
+  			{
+    			// Error forking
+    			perror("Error PID");
+  			} 
+  			else 
+  			{
+    			// Parent process
+    			do 
+    			{
+      				waitpid(pid, &status, WUNTRACED);
     			} while (!WIFEXITED(status) && !WIFSIGNALED(status));
   		}
 
+      	}
+ 	
   return 1;
 }
 
@@ -133,11 +153,9 @@ int main(int argc, char **argv)
 			index += 1;
 		}
 
-			printf("Idx = %d is %s\n", index, programName);
+		//printf("Idx = %d is %s\n", index, programName);
 
-		status = launchProgram(programName);
-
-
+		status = launchProgram(programName);    
 
 	}while(status);
 
