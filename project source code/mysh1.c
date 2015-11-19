@@ -2,7 +2,7 @@
 
 /* Include necessary header files */
 #include <sys/wait.h> 	/* Declaration for waiting - for use of the waitpid() */
-#include <unistd.h>		/* Provides access to the POSIX operating system API - for use of functions like fork(), pipe, read, write etc. */
+#include <unistd.h>		/* Provides access to the POSIX operating system API - for use of functions like fork(), pipe, read, write, chdir etc. */
 #include <stdlib.h> 	/* General purpose standard library for functions involving memory allocation, process control, conversions and others. 
 						   Also, defines maxros like EXIT_SUCCESS and EXIT_FAILURE. */
 #include <stdio.h>		/* Standard Input and Output Library - use of functions like getchar(). */
@@ -17,13 +17,26 @@
  */
 int myCd(char **args)
 {
-  if (args[1] == NULL) {
-    fprintf(stderr, "lsh: expected argument to \"cd\"\n");
-  } else {
-    if (chdir(args[1]) != 0) {
-      perror("lsh");
-    }
-  }
+	if (args[1] == NULL) 
+	{
+    		// When the command cd has no argument then 
+			// change to directory /home/$USER
+		char newDirecory[INPUT_SIZE];
+		memset(newDirecory, '\0', sizeof(newDirecory));
+		// Get USER enviromental parameter
+		char *user = getenv("USER");
+		strcat(newDirecory, "/home/");
+		strcat(newDirecory, user);
+		chdir (newDirecory);
+ 	} 
+ 	else 
+ 	{
+    	if (chdir(args[1]) != 0) 
+    	{
+      		perror("lsh");
+   		}
+  	}
+  
   return 1;
 }
 
@@ -42,7 +55,8 @@ int launchProgram(char *programName_)
 
   	token = strtok(programName_, " ");
 
- 	while (token != NULL) {
+ 	while (token != NULL) 
+ 	{
    	 	tokenisedArgs[index] = token;
     	index++;
    		 //printf("index: %d %s\n", index, args[index]);
@@ -50,40 +64,41 @@ int launchProgram(char *programName_)
   	}
   	tokenisedArgs[index] = NULL;
 
-	    if (strcmp(tokenisedArgs[0], "cd") == 0)
-	    {
-      		return myCd(tokenisedArgs);
-      	}
-      	else if (strcmp(tokenisedArgs[0], "exit") == 0)
-      	{
-      		return myExit();
-      	}
-      	else
-      	{
-      		pid = fork();
- 			if (pid == 0) {
-   	 		// Child process
-    			if (execvp(tokenisedArgs[0], tokenisedArgs) == -1) 
-    			{
-      				perror("Error");
-    			}
-    			exit(EXIT_FAILURE);
-  			} 
-  			else if (pid < 0) 
-  			{
-    			// Error forking
-    			perror("Error PID");
-  			} 
-  			else 
-  			{
-    			// Parent process
-    			do 
-    			{
-      				waitpid(pid, &status, WUNTRACED);
-    			} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+	if (strcmp(tokenisedArgs[0], "cd") == 0)
+	{
+      	return myCd(tokenisedArgs);
+    }
+    else if (strcmp(tokenisedArgs[0], "exit") == 0)
+    {
+      	return myExit();
+    }
+    else
+    {
+      	pid = fork();
+ 		if (pid == 0) 
+ 		{
+   	 	// Child process
+    		if (execvp(tokenisedArgs[0], tokenisedArgs) == -1) 
+    		{
+      			perror("Error");
+    		}
+    		exit(EXIT_FAILURE);
+  		} 
+  		else if (pid < 0) 
+  		{
+    		// Error forking
+    		perror("Error PID");
+  		} 
+  		else 
+  		{
+    		// Parent process
+    		do 
+    		{
+      			waitpid(pid, &status, WUNTRACED);
+    		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
   		}
 
-      	}
+    }
  	
   return 1;
 }
@@ -137,13 +152,13 @@ int main(int argc, char **argv)
 				break;
 				// status = 1;
 				// return status;
-			}
+			}/*
 			else if (character == ' ')
 			{
 				printf("Please give a valid program name. \nNo arguments should be given.\n");
 				status = 0;
 				return status;
-			}
+			}*/
 			else
 			{
 				programName[index] = character;
@@ -153,8 +168,8 @@ int main(int argc, char **argv)
 			index += 1;
 		}
 
-		//printf("Idx = %d is %s\n", index, programName);
-
+		// Here the programName variable contains the name of the program 
+		// that the user wants to execute.
 		status = launchProgram(programName);    
 
 	}while(status);
