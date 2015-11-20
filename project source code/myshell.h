@@ -44,13 +44,18 @@ int myCd(char **args)
    	Exit command
 	This command just terminates the shell.
  */
-int myExit()
+int myExit(char **args)
 {
+	if (args[1] != NULL)
+	{
+		printf("No arguments should be given.\n");
+		return 1;
+	}
 	return 0;
 }
 
 
-int executeCommand(char *programName_)
+int executeCommand(char *commandName_)
 {
 	char *token;
 	char **tokenisedArgs = malloc(INPUT_SIZE * sizeof(char*));
@@ -58,7 +63,7 @@ int executeCommand(char *programName_)
   	pid_t pid;
   	int status; 
 
-  	token = strtok(programName_, " ");
+  	token = strtok(commandName_, " ");
 
  	while (token != NULL) 
  	{
@@ -75,7 +80,7 @@ int executeCommand(char *programName_)
     }
     else if (strcmp(tokenisedArgs[0], "exit") == 0)
     {
-      	return myExit();
+      	return myExit(tokenisedArgs);
     }
     else
     {

@@ -1,8 +1,5 @@
-/*-------------- mysh1 ---------------------*/
+/*-------------- mysh2 ---------------------*/
 #include "myshell.h"
-
-
-// Compile command: gcc -Wall mysh1.c -o mysh1
 
 
 /*
@@ -51,17 +48,6 @@ int main(int argc, char **argv)
 			{
 				programName[index] = '\0';
 				break;
-			}
-			else if (character == ' ')
-			{
-				/* 	When the user writes a command with arguments
-					then an appropriate message is printed.
-					This also happens when he/she writes the command cd with arguments.
-					This should not happen generally, but there is no explanation in the instructions
-					of the exercise. 
-				*/
-				printf("Please give a valid program name. \nNo arguments should be given.\n");
-				continue;
 			}
 			else
 			{
