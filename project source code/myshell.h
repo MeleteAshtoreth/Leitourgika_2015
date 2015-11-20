@@ -50,4 +50,62 @@ int myExit()
 }
 
 
+int executeCommand(char *programName_)
+{
+	char *token;
+	char **tokenisedArgs = malloc(INPUT_SIZE * sizeof(char*));
+	int index = 0;
+  	pid_t pid;
+  	int status; 
+
+  	token = strtok(programName_, " ");
+
+ 	while (token != NULL) 
+ 	{
+   	 	tokenisedArgs[index] = token;
+    	index++;
+   		 //printf("index: %d %s\n", index, args[index]);
+		token = strtok(NULL, " ");
+  	}
+  	tokenisedArgs[index] = NULL;
+
+	if (strcmp(tokenisedArgs[0], "cd") == 0)
+	{
+      	return myCd(tokenisedArgs);
+    }
+    else if (strcmp(tokenisedArgs[0], "exit") == 0)
+    {
+      	return myExit();
+    }
+    else
+    {
+      	pid = fork();
+ 		if (pid == 0) 
+ 		{
+   	 	// Child process
+    		if (execvp(tokenisedArgs[0], tokenisedArgs) == -1) 
+    		{
+      			perror("Error");
+    		}
+    		exit(EXIT_FAILURE);
+  		} 
+  		else if (pid < 0) 
+  		{
+    		// Error forking
+    		perror("Error PID");
+  		} 
+  		else 
+  		{
+    		// Parent process
+    		do 
+    		{
+      			waitpid(pid, &status, WUNTRACED);
+    		} while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  		}
+
+    }
+ 	
+  return 1;
+}
+
 #endif
