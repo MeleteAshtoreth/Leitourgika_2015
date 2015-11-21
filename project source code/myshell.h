@@ -51,10 +51,10 @@ int myCd(char **args)
       {
         // E.g when the path is ~/Desktop.
         int start_Index = 2;
-        int index = 0;
+        int index;
         char *realPath = malloc(sizeof(char) * INPUT_SIZE);
 
-        for (index; index < INPUT_SIZE; index++)
+        for (index=0; index < INPUT_SIZE; index++)
         {
           // Copy substring after ~/ 
           realPath[index] = relativePath[start_Index + index];
