@@ -10,6 +10,18 @@
 
 #define INPUT_SIZE 1024 /* This is size of the input from the user. */
 
+char* getHomePath()
+{
+  char* homePath = malloc(sizeof(char) * INPUT_SIZE);
+  
+  // Get USER enviromental parameter
+  char *user = getenv("USER");
+  strcat(homePath, "/home/");
+  strcat(homePath, user);
+  strcat(homePath, "/");
+  return homePath;
+}
+
 /**
    Bultin command: change directory.
    args: List of args.  args[0] is "cd".  args[1] is the directory.
@@ -19,23 +31,53 @@ int myCd(char **args)
 {
 	if (args[1] == NULL) 
 	{
-    		// When the command cd has no argument then 
-			// change to directory /home/$USER
-		char newDirecory[INPUT_SIZE];
-		memset(newDirecory, '\0', sizeof(newDirecory));
-		// Get USER enviromental parameter
-		char *user = getenv("USER");
-		strcat(newDirecory, "/home/");
-		strcat(newDirecory, user);
-		chdir (newDirecory);
- 	} 
+    	// When the command cd has no argument then 
+		// change to the $HOME directory /home/$USER
+    printf("Go to $user path\n");
+		// char newDirecory[INPUT_SIZE];
+		// memset(newDirecory, '\0', sizeof(newDirecory));
+		// // Get USER enviromental parameter
+		// char *user = getenv("USER");
+		// strcat(newDirecory, "/home/");
+		// strcat(newDirecory, user);
+		chdir (getHomePath());
+ 	}
  	else 
- 	{
-    	if (chdir(args[1]) != 0) 
-    	{
-      		perror("Error: ");
-   		}
-  	}
+  {
+      char *relativePath = malloc(sizeof(char) * INPUT_SIZE);
+      strcpy(relativePath, args[1]);
+      
+      if ((relativePath[0] == '~') && (relativePath[1] == '/'))
+      {
+        // E.g when the path is ~/Desktop.
+        int start_Index = 2;
+        int index = 0;
+        char *realPath = malloc(sizeof(char) * INPUT_SIZE);
+
+        for (index; index < INPUT_SIZE; index++)
+        {
+          // Copy substring after ~/ 
+          realPath[index] = relativePath[start_Index + index];
+        }
+
+      char *newPath = getHomePath();
+      strcat(newPath, realPath);
+      if (chdir(newPath) != 0) 
+      {
+        perror("Error ");
+      }
+    }
+    else
+    {
+      int status;
+      printf("Bultin command!!!!\n");
+      status = chdir(args[1]);
+      if (status != 0) 
+      {
+          perror("Error ");
+      }
+    }
+  }
   
   return 1;
 }
