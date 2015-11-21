@@ -102,11 +102,11 @@ int executeCommand(char *commandName_)
 	char *token;
 	char **tokenisedArgs = malloc(INPUT_SIZE * sizeof(char*));
 	int index = 0;
-  	pid_t pid;
-  	int status; 
+  pid_t pid;
+  int status; 
 
-  	token = strtok(commandName_, " ");
-
+  token = strtok(commandName_, " ");
+  printf("Command:%s\n", commandName_);
  	while (token != NULL) 
  	{
    	 	tokenisedArgs[index] = token;

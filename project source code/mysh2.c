@@ -60,7 +60,8 @@ int main(int argc, char **argv)
 
 		// Here the programName variable contains the name of the program 
 		// that the user wants to execute.
-		status = executeCommand(programName);    
+			if (programName[0] != '\0')
+				status = executeCommand(programName);    
 
 	}while(status);
 
