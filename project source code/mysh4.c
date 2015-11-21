@@ -203,7 +203,7 @@ int main(int argc, char **argv)
 				status = executeCommand(programName);  
 			}
 		}
-		printf("Status:%d\n", status);
+		//printf("Status:%d\n", status);
 	}while(status);
 
   // Perform any shutdown/cleanup.
