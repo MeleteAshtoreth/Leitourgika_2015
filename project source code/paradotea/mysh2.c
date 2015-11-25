@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 		*/
 		if (programName == NULL)
 		{
-			fprintf(stderr, "programName allocation error!!\n");
+			// fprintf(stderr, "programName allocation error!!\n");
 			status = 0;
 		}
 		
