@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 		*/
 		if (programName == NULL)
 		{
-			fprintf(stderr, "programName allocation error!!\n");
+			// fprintf(stderr, "programName allocation error!!\n");
 			status = 0;
 		}
 		
@@ -175,7 +175,7 @@ int main(int argc, char **argv)
 				}
 				else
 				{
-					printf("Multiple pipes are not supported.\n");
+					// printf("Multiple pipes are not supported.\n");
 					status = 1;
 				} 
 					

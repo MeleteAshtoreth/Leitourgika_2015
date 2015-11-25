@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 		*/
 		if (programName == NULL)
 		{
-			fprintf(stderr, "programName allocation error!!\n");
+			// fprintf(stderr, "programName allocation error!!\n");
 			status = 0;
 		}
 		
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 					This should not happen generally, but there is no explanation in the instructions
 					of the exercise. 
 				*/
-				printf("Please give a valid program name. \nNo arguments should be given.\n");
+				// printf("Please give a valid program name. \nNo arguments should be given.\n");
 				continue;
 			}
 			else

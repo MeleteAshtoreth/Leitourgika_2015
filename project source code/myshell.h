@@ -70,7 +70,7 @@ int myCd(char **args)
     else
     {
       int status;
-      printf("Bultin command!!!!\n");
+      // printf("Bultin command!!!!\n");
       status = chdir(args[1]);
       if (status != 0) 
       {
@@ -90,7 +90,7 @@ int myExit(char **args)
 {
 	if (args[1] != NULL)
 	{
-		printf("No arguments should be given.\n");
+		// printf("No arguments should be given.\n");
 		return 1;
 	}
 	return 0;
