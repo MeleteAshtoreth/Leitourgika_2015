@@ -33,7 +33,7 @@ int myCd(char **args)
 	{
     	// When the command cd has no argument then 
 		// change to the $HOME directory /home/$USER
-    printf("Go to $user path\n");
+    // printf("Go to $user path\n");
 		// char newDirecory[INPUT_SIZE];
 		// memset(newDirecory, '\0', sizeof(newDirecory));
 		// // Get USER enviromental parameter
@@ -106,7 +106,7 @@ int executeCommand(char *commandName_)
   int status; 
 
   token = strtok(commandName_, " ");
-  printf("Command:%s\n", commandName_);
+  // printf("Command:%s\n", commandName_);
  	while (token != NULL) 
  	{
    	 	tokenisedArgs[index] = token;
