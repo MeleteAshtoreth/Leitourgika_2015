@@ -1,5 +1,5 @@
 /*-------------- mysh1 ---------------------*/
-#include "myshell.h"
+#include "myshHeader.h"
 
 
 // Compile command: gcc -Wall mysh1.c -o mysh1
