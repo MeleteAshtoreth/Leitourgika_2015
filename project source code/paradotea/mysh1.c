@@ -7,7 +7,7 @@
 
 /*
 	This is the main funtion.
-	Arguments:
+	Input:
 		argc is a count of the arguments supplied to the program
 		argv  is an array of pointers to the strings which are those arguments
 	
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	do
 	{
 		/*	Start implementantion.
-		It should stop when status is 0 (failure).	
+			It should stop when status is 0 (failure).	
 		*/
 
 		/* Set prompt as the '$' character.	*/
@@ -29,22 +29,14 @@ int main(int argc, char **argv)
 
 		int inputSize = INPUT_SIZE; /* Set the buffer size of input. */
 		int index = 0; /* Set the index of the input buffer. Initialise it to 0.*/
-		char *programName = malloc(sizeof(char) * inputSize); /* Allocate an array named programName of inputSize. This will contain the input from the user. */
 		int character;
-
-		/* 	Error checking.
-			If the programName array is NULL then the program should terminate
-			showing the appropriate message to the user.
-		*/
-		if (programName == NULL)
-		{
-			// fprintf(stderr, "programName allocation error!!\n");
-			status = 0;
-		}
+		char *programName = malloc(sizeof(char) * inputSize); /* Allocate an array named programName of inputSize. 
+																 This will contain the input from the user. 
+															  */
 		
 		while(1)
 		{
-			character = getchar(); /* Read characters from the user input. */
+			character = getchar(); // Read characters from the user input. 
 
 			/* 	Check character. */
 			if (character == EOF || character == '\n')
@@ -60,7 +52,6 @@ int main(int argc, char **argv)
 					This should not happen generally, but there is no explanation in the instructions
 					of the exercise. 
 				*/
-				// printf("Please give a valid program name. \nNo arguments should be given.\n");
 				continue;
 			}
 			else
@@ -72,12 +63,16 @@ int main(int argc, char **argv)
 			index += 1;
 		}
 
-		// Here the programName variable contains the name of the program 
-		// that the user wants to execute.
+		// Here the programName contains 
+		// the command and its arguments that will be executed.
 		if (programName[0] != '\0')
 			status = executeCommand(programName);    
 
+		// Free memory from malloc.
+		free(programName);
+
 	}while(status);
+
 
 
   // Perform any shutdown/cleanup.
