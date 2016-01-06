@@ -1,118 +1,124 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#include <sys/ipc.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <sys/sem.h>
+#include <sys/wait.h>
+
+#include <string.h>
+#include <errno.h>
+
 #include "display.h"
 
+#define SEM_KEY 1234
 #define NUM_PROC 10
-#define SEM_NUM 2
 
 int main()
 {
-	pid_t child;
-	int i, rc;
-	
-	// Semaphore parameters
-	int sem_id;
-	struct sembuf sem_op;
-	union semun
-	{
-		int val;
-		struct semid_ds *buf;
-		unsigned short int *array;
-		struct seminfo *_buf;
-	} sem_arg;
-	
-	// Allocate semaphore
-	sem_id = semget(IPC_PRIVATE,  SEM_NUM, 0600 | IPC_CREAT );
-	if ( sem_id == -1 )
-	{
-		perror("Semaphore initialization.\n");
-		exit(1);
-	}
-	
-	
-	if (fork())
-	{
-		//printf("Child\n");
-	
-				// Initialize semaphore
-			unsigned short values[1];
-			values[0] = 1;
-			sem_arg.array = values;
-			//printf("Sem %d\n", i);
-			sem_arg.val = 1;
-			rc = semctl(sem_id,  NUM_PROC, SETVAL, sem_arg);
-			if (rc == -1)
-			{
-				perror("Main: semctl");
-				exit(1);
-			}
-			
-			
-		for (i=0; i<  NUM_PROC; i++)
- 		{
-		
-			sem_op.sem_num = i;
-			sem_op.sem_op = -1;
-			sem_op.sem_flg = 0;
-			semop(sem_id, &sem_op, 1);
-	
-			display("Hello world\n");
-			wait(NULL);
-			
-			// release semaphore
-			sem_op.sem_num = i;
-			sem_op.sem_op = 1;
-			sem_op.sem_flg = 0;
-			semop(sem_id, &sem_op, 1);
-			}
-			
-						  // Deallocate semaphore
-			rc = semctl(sem_id, NUM_PROC, IPC_RMID, sem_arg);
-			//printf("Child Deallocate sem rc: %d\n", rc);
-  }
-  else
-  {
-	  //printf("Parent\n");
-	
-					// Initialize semaphore
-		/*	unsigned short values[1];
-			values[0] = 1;
-			sem_arg.array = values;
-			//printf("Sem %d\n", i);
-			sem_arg.val = 1;
-			rc = semctl(sem_id,  1, SETVAL, sem_arg);
-			if (rc == -1)
-			{
-				perror("Main: semctl");
-				exit(1);
-			}
-			*/
-	for (i = 0; i < NUM_PROC; i++)
-	{	
-			/*sem_op.sem_num = 1;
-			sem_op.sem_op = -1;
-			sem_op.sem_flg = 0;
-			semop(i, &sem_op, 1);
-	*/
-			display("Kalimera kosme\n");
-			
-		/*	// release semaphore
-			sem_op.sem_num = 0;
-			sem_op.sem_op = 1;
-			sem_op.sem_flg = 0;
-			semop(i, &sem_op, 1);
-			*/
 
-		}
-					  // Deallocate semaphore
-			//rc = semctl(1, 1, IPC_RMID, sem_arg);
-			//printf("Parent Deallocate sem rc: %d\n", rc);
-			
-	}
-  
-  return 0;
+    union semun 
+    {
+        int val;
+        struct semid_ds *buf;
+        ushort *array;
+    } sem_val;
+
+    int semid;
+    int nsops;
+    int nsems = 1;
+    int semflg = IPC_CREAT | 0666;
+    int rc;
+
+    int childpid;
+    int i;
+
+    // struct sembuf wit,signal;
+    struct sembuf *sops = (struct sembuf *) malloc( 2*sizeof(struct sembuf));
+
+    // Create semaphore set with nsems semaphores in it
+    // and with access only to the owner.
+    if ( (semid = semget(semid, 1, IPC_CREAT | 0600)) == -1)
+    {
+        perror("semget: semget failed");
+        exit(1);
+    }
+
+    sem_val.val = 1;
+    if ( (rc = semctl(semid, 0, SETVAL, sem_val)) == -1 )
+    {
+        perror("semget: semget failedl");
+        exit(1);
+    }
+
+
+    childpid = fork();
+
+    if (childpid < 0)
+    {
+        perror("fork");
+        exit(1);
+    }
+    else if (childpid == 0)
+    {     
+        int i;
+        for (i =0; i < NUM_PROC; i++)
+        {
+            struct sembuf sem_op;
+
+            sem_op.sem_num = 0;
+            sem_op.sem_op = -1;
+            sem_op.sem_flg = 0;
+            semop(semid, &sem_op, 1);
+
+            display("Hello world\n");
+
+            sem_op.sem_num = 0;
+            sem_op.sem_op = 1;
+            sem_op.sem_flg = 0;
+            semop(semid, &sem_op, 1);            
+        }
+
+        return 0;
+    }
+    else
+    {
+        int j;
+        for (j = 0; j < NUM_PROC; j++)
+        {
+        // Parent
+        struct sembuf sem_op;
+
+        sem_op.sem_num = 0;
+        sem_op.sem_op = -1;
+        sem_op.sem_flg = 0;
+        semop(semid, &sem_op, 1);
+
+        display("Kalimera kosme\n");
+
+
+        sem_op.sem_num = 0;
+        sem_op.sem_op = 1;
+        sem_op.sem_flg = 0;
+        semop(semid, &sem_op, 1);            
+        }
+
+
+    }
+
+   
+    // semctl(semid,0,GETVAL, argument);
+    // sleep(1);
+
+    /* wait for all children to finish running */
+    for (i=0; i<NUM_PROC; i++) {
+        int child_status;
+
+        wait(&child_status);
+    }
+
+     semctl(semid,0,IPC_RMID);
+    //  printf("\nSemaphore removed from the System = %s\n",strerror(errno));
+    return 0;
 }

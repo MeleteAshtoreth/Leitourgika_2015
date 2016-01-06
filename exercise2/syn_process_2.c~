@@ -13,7 +13,7 @@
 #include "display.h"
 
 #define SEM_KEY 1234
-#define NUM_PROC 10
+#define NUM_PROC 100000
 
 int main()
 {

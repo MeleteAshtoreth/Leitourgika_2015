@@ -28,25 +28,23 @@ int main(int argc, char *argv[])
 
 	//pthread_mutex_init(&printf_mutex, NULL);
 
-	for(i=0; i<NUM_THREADS; i++)
- 	{
-     		rc = pthread_create(&threads[i], NULL, print_function,  (void *)msg1);
-  		rc = pthread_create(&threads[i], NULL, print_function,  (void *)msg2);
+	// for(i=0; i<NUM_THREADS; i++)
+ // 	{
+  rc = pthread_create(&threads[i], NULL, print_function,  (void *)msg1);
+  rc = pthread_create(&threads[i], NULL, print_function,  (void *)msg2);
 
-     		if (rc)
-		{
-       			printf("ERROR; return code from pthread_create() is %d\n", rc);
-       			exit(-1);
-      		}
-  	}
+  if (rc)
+  {
+    printf("ERROR; return code from pthread_create() is %d\n", rc);
+    exit(-1);
+  }
 
 
-   	for(j=0; j < NUM_THREADS; j++)
-   	{
-     		pthread_join( threads[j], NULL); 
-  	}
 
-	pthread_mutex_destroy(printf_mutex);
+  pthread_join( threads[0], NULL); 
+  pthread_join( threads[1], NULL);
+
+	pthread_mutex_destroy(&printf_mutex);
 
   	 /* Last thing that main() should do */
    	pthread_exit(NULL);
