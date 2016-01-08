@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "display.h"
 
@@ -12,14 +13,21 @@ void *print_function(void *arg)
 {
 	char *p = arg;
 	
-	pthread_mutex_lock(&printf_mutex);
-	display(p);
-	pthread_mutex_unlock(&printf_mutex);
+  int i;
+  for (i = 0; i < NUM_THREADS; i++)
+  {
+    pthread_mutex_lock(&printf_mutex);
+    display(p);
+    pthread_mutex_unlock(&printf_mutex);
+    sleep(1);
+  }
+
 }
+
 
 int main(int argc, char *argv[])
 {
-   pthread_t threads[NUM_THREADS];
+   pthread_t threads[2];
    int rc;
    int i, j;
 	
@@ -28,10 +36,9 @@ int main(int argc, char *argv[])
 
 	//pthread_mutex_init(&printf_mutex, NULL);
 
-	// for(i=0; i<NUM_THREADS; i++)
- // 	{
-  rc = pthread_create(&threads[i], NULL, print_function,  (void *)msg1);
-  rc = pthread_create(&threads[i], NULL, print_function,  (void *)msg2);
+  rc = pthread_create(&threads[0], NULL, print_function,  (void *)msg1);
+
+  rc = pthread_create(&threads[1], NULL, print_function,  (void *)msg2);
 
   if (rc)
   {

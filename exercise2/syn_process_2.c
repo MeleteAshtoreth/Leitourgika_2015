@@ -4,6 +4,7 @@
 
 #include <sys/ipc.h>
 #include <sys/types.h>
+#include <sys/shm.h>
 #include <sys/sem.h>
 #include <sys/wait.h>
 
@@ -13,7 +14,51 @@
 #include "display.h"
 
 #define SEM_KEY 1234
-#define NUM_PROC 10
+#define NUM_PROC 100
+
+void * print_ab(int id)
+{
+    int i;
+        for (i =0; i < NUM_PROC; i++)
+        {
+            struct sembuf sem_op;
+
+            sem_op.sem_num = 0;
+            sem_op.sem_op = -1;
+            sem_op.sem_flg = 0;
+            semop(id, &sem_op, 1);
+
+            display("ab");
+            usleep(500000);
+
+            sem_op.sem_num = 0;
+            sem_op.sem_op = 1;
+            sem_op.sem_flg = 0;
+            semop(id, &sem_op, 1);      
+        }
+}
+
+void * print_cd(int id)
+{
+    int i;
+        for (i =0; i < NUM_PROC; i++)
+        {
+            struct sembuf sem_op;
+
+            sem_op.sem_num = 0;
+            sem_op.sem_op = -1;
+            sem_op.sem_flg = 0;
+            semop(id, &sem_op, 1);
+
+            display("cd\n");
+            usleep(500000);
+
+            sem_op.sem_num = 0;
+            sem_op.sem_op = 1;
+            sem_op.sem_flg = 0;
+            semop(id, &sem_op, 1);      
+        }
+}
 
 int main()
 {
@@ -25,7 +70,7 @@ int main()
         ushort *array;
     } sem_val;
 
-    int semid;
+    int semid1, semid2;
     int nsops;
     int nsems = 1;
     int semflg = IPC_CREAT | 0666;
@@ -39,18 +84,30 @@ int main()
 
     // Create semaphore set with nsems semaphores in it
     // and with access only to the owner.
-    if ( (semid = semget(semid, 1, IPC_CREAT | 0600)) == -1)
+    if ( (semid1 = semget(semid1, 1, semflg)) == -1)
+    {
+        perror("semget: semget failed");
+        exit(1);
+    }
+
+    if ( (semid2 = semget(semid2, 1, semflg)) == -1)
     {
         perror("semget: semget failed");
         exit(1);
     }
 
     sem_val.val = 1;
-    if ( (rc = semctl(semid, 0, SETVAL, sem_val)) == -1 )
+    if ( (rc = semctl(semid2, 0, SETVAL, sem_val)) == -1 )
     {
         perror("semget: semget failedl");
         exit(1);
     }
+    if ( (rc = semctl(semid1, 0, SETVAL, sem_val)) == -1 )
+    {
+        perror("semget: semget failedl");
+        exit(1);
+    }
+
 
 
     childpid = fork();
@@ -62,49 +119,13 @@ int main()
     }
     else if (childpid == 0)
     {     
-        int i;
-        for (i =0; i < NUM_PROC; i++)
-        {
-            struct sembuf sem_op;
-
-            sem_op.sem_num = 0;
-            sem_op.sem_op = -1;
-            sem_op.sem_flg = 0;
-            semop(semid, &sem_op, 1);
-
-            display("cd\n");
-
-            sem_op.sem_num = 0;
-            sem_op.sem_op = 1;
-            sem_op.sem_flg = 0;
-            semop(semid, &sem_op, 1);            
-        }
+        print_ab(semid1);
 
         return 0;
     }
     else
     {
-        int j;
-        for (j = 0; j < NUM_PROC; j++)
-        {
-        // Parent
-        struct sembuf sem_op;
-
-        sem_op.sem_num = 0;
-        sem_op.sem_op = -1;
-        sem_op.sem_flg = 0;
-        semop(semid, &sem_op, 1);
-
-        display("ab");
-
-
-        sem_op.sem_num = 0;
-        sem_op.sem_op = 1;
-        sem_op.sem_flg = 0;
-        semop(semid, &sem_op, 1);            
-        }
-
-
+        print_cd(semid2);
     }
 
    
@@ -118,7 +139,8 @@ int main()
         wait(&child_status);
     }
 
-     semctl(semid,0,IPC_RMID);
+     semctl(semid1,0,IPC_RMID);
+     semctl(semid2,0,IPC_RMID);
     //  printf("\nSemaphore removed from the System = %s\n",strerror(errno));
     return 0;
 }

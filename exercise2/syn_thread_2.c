@@ -6,59 +6,62 @@
 #include <pthread.h>
 #include "display.h"
 
-#define NUM_THREADS 10000
+#define NUM_THREADS 10
 
 unsigned int shared_data = 0;
 
 unsigned int rc;
-pthread_mutex_t printf_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
-// try uncommenting and commenting the mutext below
-// and look at the output
 
-void print(char* a) {
-  // pthread_mutex_lock(&printf_mutex); // comment out
+void print(char* a) 
+{
   display(a);
-  //display("cd\n");
-  // pthread_mutex_unlock(&printf_mutex); // comment out
 }
 
-
-// These two functions will run concurrently.
 void* print_ab(void *ptr) 
 {
-  rc = pthread_mutex_lock(&printf_mutex);
+  
   int i;
   do 
   {
     if(shared_data%2 == 0)
     {
+      rc = pthread_mutex_lock(&lock);
       print("ab");
       shared_data++;
+      // printf("\nShared dataAB: %d", shared_data);
+      pthread_cond_signal(&cond);
     }
     else
     {
-      rc = pthread_mutex_unlock(&printf_mutex);//if number is even, do not print, release mutex
+      pthread_cond_wait(&cond, &lock);
     }
-  }while(shared_data < NUM_THREADS);
+    rc = pthread_mutex_unlock(&lock);//if number is even, do not print, release mutex
+  }while(shared_data < 2*NUM_THREADS);
 }
 
 void* print_cd(void *ptr) 
 {
-    rc = pthread_mutex_lock(&printf_mutex);
+    
   int i;
   do
   {
+    rc = pthread_mutex_lock(&lock);
     if(shared_data%2 != 0)
     {
-      printf("cd\n");
+      print("cd\n");
       shared_data++;
+      // printf("\nShared dataCD: %d", shared_data);
+      pthread_cond_signal(&cond);
     }
     else
     {
-      rc=pthread_mutex_unlock(&printf_mutex);//if number is odd, do not print, release mutex
+      pthread_cond_wait(&cond, &lock);
     }
-  }while(shared_data < NUM_THREADS);
+    rc=pthread_mutex_unlock(&lock);//if number is odd, do not print, release mutex
+  }while(shared_data < 2*NUM_THREADS);
 }
 
 int main() {
@@ -83,7 +86,7 @@ int main() {
   pthread_join(t1,NULL);
   pthread_join(t2,NULL);
 
-  pthread_mutex_destroy(&printf_mutex);
+  pthread_mutex_destroy(&lock);
 
      /* Last thing that main() should do */
     pthread_exit(NULL);
